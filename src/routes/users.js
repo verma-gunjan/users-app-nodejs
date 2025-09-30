@@ -2,11 +2,12 @@ const express = require('express');
 const userRouter = express.Router();
 const { users, roles, groups } = require("../dummy_data/data");
 const validateUserData = require("../validators/userValidator");
+const checkPermission = require("../middleware/permissions");
 
 let userList = [...users];
 
 // GET /users
-userRouter.get("/", (req, res) => {
+userRouter.get("/",checkPermission("VIEW"), (req, res) => {
   try {
     res.json(userList);
   } catch (err) {
@@ -15,7 +16,7 @@ userRouter.get("/", (req, res) => {
 });
 
 // GET /users/managed/:id
-userRouter.get('/managed/:id', (req, res) => {
+userRouter.get('/managed/:id',checkPermission("VIEW"), (req, res) => {
   try {
     const id = Number(req.params.id);
     const user = userList.find(u => u.id === id);
@@ -30,7 +31,7 @@ userRouter.get('/managed/:id', (req, res) => {
 });
 
 // POST /users
-userRouter.post("/", (req, res) => {
+userRouter.post("/",checkPermission("CREATE"), (req, res) => {
   try {
     const { name, roles: userRoles, groups: userGroups } = req.body;
 
@@ -48,17 +49,17 @@ userRouter.post("/", (req, res) => {
 });
 
 // PATCH /users/:id
-userRouter.patch('/:id', (req, res) => {
+userRouter.patch('/:id',checkPermission("EDIT"), (req, res) => {
   try {
     const id = Number(req.params.id);
     const user = userList.find(u => u.id === id);
     if (!user) return res.status(404).json({ error: 'User not found' });
 
-    const { name, roles: userRoles, groups: userGroups } = req.body;
-
-    if (!validateUserData(req.body)) {
+    if (!validateUserData(req.body, true)) {
       return res.status(400).json({ error: "Invalid profile data" });
     }
+
+    const { name, roles: userRoles, groups: userGroups } = req.body;
 
     if (name) user.name = name;
     if (userRoles && Array.isArray(userRoles)) user.roles = userRoles.filter(r => roles.includes(r));
@@ -71,7 +72,7 @@ userRouter.patch('/:id', (req, res) => {
 });
 
 // DELETE /users/:id
-userRouter.delete('/:id', (req, res) => {
+userRouter.delete('/:id',checkPermission("DELETE"), (req, res) => {
   try {
     const id = Number(req.params.id);
     const index = userList.findIndex(u => u.id === id);
