@@ -54,11 +54,11 @@ userRouter.patch('/:id', (req, res) => {
     const user = userList.find(u => u.id === id);
     if (!user) return res.status(404).json({ error: 'User not found' });
 
-    const { name, roles: userRoles, groups: userGroups } = req.body;
-
-    if (!validateUserData(req.body)) {
+    if (!validateUserData(req.body, true)) {
       return res.status(400).json({ error: "Invalid profile data" });
     }
+
+    const { name, roles: userRoles, groups: userGroups } = req.body;
 
     if (name) user.name = name;
     if (userRoles && Array.isArray(userRoles)) user.roles = userRoles.filter(r => roles.includes(r));
