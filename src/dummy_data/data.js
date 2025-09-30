@@ -7,7 +7,12 @@ const users = [
     { id: 6, name: "Gabriela Wozniak", roles: ["VIEWER", "PERSONAL"], groups: ["GROUP_1"] }
   ];
   
-  const roles = ["ADMIN", "PERSONAL", "VIEWER"];
+  const roles = [
+    { name: "Admin", code: "ADMIN", permissions: ["CREATE", "VIEW", "EDIT", "DELETE"] },
+    { name: "Personal", code: "PERSONAL", permissions: [] },
+    { name: "Viewer", code: "VIEWER", permissions: ["VIEW"] }
+  ];
+
   const groups = ["GROUP_1", "GROUP_2"];
   
   module.exports = { users, roles, groups };
